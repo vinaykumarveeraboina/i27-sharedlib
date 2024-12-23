@@ -48,7 +48,7 @@ def call(Map pipelineParams)
             }
             steps {
                 script {
-                    applicationBuild()
+                   build.applicationBuild()
                 }
             }
         }
@@ -209,7 +209,7 @@ def imagevalidation() {
     } catch (Exception e) {
         println( " *******************   OOPS! Image with this tag is not available  ************************* ")
         println("*********************** Building Application  *****************************************")
-        applicationBuild()
+         build.applicationBuild()
         println("*********************** Image build and push to Hub  *****************************************")
         dockerBuildPush()
     }
