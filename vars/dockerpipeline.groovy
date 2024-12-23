@@ -1,4 +1,4 @@
-import com.i27academy.builds.javabuild
+import com.i27academy.builds.Javabuild
 
 
 def call(Map pipelineParams)
