@@ -2,8 +2,8 @@ package com.i27academy.builds
 
 class Docker{
     def jenkins
-    Docker jenkins {
-        jenkins = this.jenkins
+    Docker (jenkins){
+      this.jenkins =  jenkins 
 }
 
 //Application Build
