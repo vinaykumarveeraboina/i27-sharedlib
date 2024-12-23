@@ -3,7 +3,7 @@ import com.i27academy.builds.javabuild
 
 def call(Map pipelineParams)
 {
-  javabuild build = new javabuild(this)
+  Javabuild build = new Javabuild(this)
 
   // will write entire pipeline here 
 
