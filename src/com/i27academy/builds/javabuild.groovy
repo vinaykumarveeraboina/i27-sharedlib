@@ -1,6 +1,6 @@
 package com.i27academy.builds
 
-class javabuild{
+class Javabuild{
     def jenkins
     Javabuild (jenkins) {
       this.jenkins =  jenkins 
