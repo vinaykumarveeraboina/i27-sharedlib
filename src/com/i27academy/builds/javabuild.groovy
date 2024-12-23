@@ -1,8 +1,8 @@
 package com.i27academy.builds
 
-class Docker{
+class javabuild{
     def jenkins
-    Docker (jenkins){
+    javabuild (jenkins) {
       this.jenkins =  jenkins 
 }
 
