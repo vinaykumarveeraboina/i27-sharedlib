@@ -116,7 +116,7 @@ def call(Map pipelineParams)
             }
             steps {
                 script {
-                    imagevalidation().call()
+                    imagevalidation()
                     DockerDeploy('dev', '5761', '8761')
                 }
             }
@@ -200,7 +200,7 @@ def DockerDeploy(envdeploy, hostport, contport) {
     }
 }
 
-def imagevalidation() {
+def imagevalidation(build) {
     
     println(" **********************  pulling the docker image *******************************")
     try {
