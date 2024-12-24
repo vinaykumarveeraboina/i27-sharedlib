@@ -116,7 +116,7 @@ def call(Map pipelineParams)
             }
             steps {
                 script {
-                    imagevalidation()
+                    imagevalidation(build)
                     DockerDeploy('dev', '5761', '8761')
                 }
             }
@@ -152,7 +152,7 @@ def call(Map pipelineParams)
                input message : " Deploying  ${env.APPLICATION_NAME} to stage ??? " , ok :'YES', submitter : 'owner'
                }
                 script {
-                    imagevalidation()
+                    imagevalidation(build)
                     DockerDeploy('stage', '7761', '8761')
                 }
             }
@@ -201,7 +201,7 @@ def DockerDeploy(envdeploy, hostport, contport) {
 }
 
 def imagevalidation(build) {
-    return{
+    
     println(" **********************  pulling the docker image *******************************")
     try {
         sh """
@@ -215,7 +215,7 @@ def imagevalidation(build) {
         dockerBuildPush()
     }
 }
-}
+
 
 
 // This function will build the image and push to docker hub
