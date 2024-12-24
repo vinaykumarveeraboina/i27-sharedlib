@@ -210,7 +210,7 @@ def imagevalidation(build) {
     } catch (Exception e) {
         println( " *******************   OOPS! Image with this tag is not available  ************************* ")
         println("*********************** Building Application  *****************************************")
-        build.applicationBuild('${env.APPLICATION_NAME}')
+        build.applicationBuild(${env.APPLICATION_NAME})
         println("*********************** Image build and push to Hub  *****************************************")
         dockerBuildPush()
     }
