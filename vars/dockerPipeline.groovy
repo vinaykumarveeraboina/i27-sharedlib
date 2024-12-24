@@ -200,7 +200,7 @@ def DockerDeploy(envdeploy, hostport, contport) {
     }
 }
 
-def imagevalidation(build) {
+def imagevalidation() {
     
     println(" **********************  pulling the docker image *******************************")
     try {
