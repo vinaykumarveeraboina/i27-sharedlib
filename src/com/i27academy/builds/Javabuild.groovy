@@ -8,6 +8,7 @@ class Javabuild {
 
     // Application Build
     def applicationBuild(appName) {
+      return{
         jenkins.sh """ 
         echo "Building the ${appName} application"
         sh "mvn clean package -DskipTests=true"
@@ -15,4 +16,5 @@ class Javabuild {
     }
 
     
+}
 }
