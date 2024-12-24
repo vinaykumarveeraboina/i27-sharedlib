@@ -48,7 +48,7 @@ def call(Map pipelineParams)
             }
             steps {
                 script {
-                   build.applicationBuild("${env.APPLICATION_NAME}")
+                   build.applicationBuild(${env.APPLICATION_NAME})
                 }
             }
         }
