@@ -12,6 +12,7 @@ class Javabuild {
     
    
         jenkins.sh """ 
+        
         echo "Building the ${appName} application"
         mvn clean package -DskipTests=true
 
