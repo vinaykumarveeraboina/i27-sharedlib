@@ -48,7 +48,7 @@ def call(Map pipelineParams)
             steps{
 
                 echo " executing in AKS "
-                scripts{
+                script {
                 k8s.akslogin()
                 }
 
