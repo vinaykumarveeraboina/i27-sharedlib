@@ -27,7 +27,9 @@ def call(Map pipelineParams)
     }
     environment {
         DOCKERHUB = "docker.io/vinaykumarveeraboina"
-        APPLICATION_NAME = 'eureka'
+
+        APPLICATION_NAME = "${pipelineparams.appName}"
+        //APPLICATION_NAME = 'eureka'
         POM_VERSION = readMavenPom().getVersion()
         POM_PACKAGING = readMavenPom().getPackaging()
         DOCKER_CREDS = credentials('DockerHub')
