@@ -201,6 +201,7 @@ def DockerDeploy(envdeploy, hostport, contport) {
 }
 
 def imagevalidation(build) {
+    return{
     println(" **********************  pulling the docker image *******************************")
     try {
         sh """
@@ -213,6 +214,7 @@ def imagevalidation(build) {
         println("*********************** Image build and push to Hub  *****************************************")
         dockerBuildPush()
     }
+}
 }
 
 
