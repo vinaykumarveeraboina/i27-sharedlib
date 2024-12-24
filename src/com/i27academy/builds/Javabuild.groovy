@@ -10,7 +10,7 @@ class Javabuild{
 
 def applicationBuild() {
 
-     jenkins.sh """ 
+     jenkins.sh """ !#/bin/bash
       echo "Building the ${env.APPLICATION_NAME} application"
       sh "mvn clean package -DskipTests=true"
    
