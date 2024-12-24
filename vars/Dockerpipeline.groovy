@@ -166,7 +166,7 @@ def call(Map pipelineParams)
         }
     }
  }
-}
+
 
 // This method is developed for deploying our app in different environments
 def DockerDeploy(envdeploy, hostport, contport) {
@@ -230,4 +230,5 @@ def dockerBuildPush() {
     echo "********************* Docker push *************************************"
     docker push ${env.DOCKERHUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}
     """
+}
 }
