@@ -41,7 +41,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        build.applicationBuild(env.APPLICATION_NAME)
+                        build.applicationBuild(env.APPLICATION_NAME).call()
                     }
                 }
             }
@@ -91,7 +91,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        dockerBuildPush()
+                        dockerBuildPush().call()
                     }
                 }
             }
@@ -103,7 +103,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        imagevalidation(build)
+                        imagevalidation().call()
                         DockerDeploy('dev', '5761', '8761')
                     }
                 }
@@ -116,8 +116,8 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        imagevalidation(build)
-                        DockerDeploy('test', '6761', '8761')
+                        imagevalidation().call()
+                        DockerDeploy('test', '6761', '8761').call()
                     }
                 }
             }
@@ -192,9 +192,9 @@ def imagevalidation(build) {
     } catch (Exception e) {
         println( " *******************   OOPS! Image with this tag is not available  ************************* ")
         println("*********************** Building Application  *****************************************")
-        build.applicationBuild(env.APPLICATION_NAME)
+        build.applicationBuild(env.APPLICATION_NAME).call()
         println("*********************** Image build and push to Hub  *****************************************")
-        dockerBuildPush()
+        dockerBuildPush().call()
     }
 }
 
