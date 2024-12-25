@@ -22,19 +22,26 @@ class K8s {
 
       }
 
-      def aksdeploy(filename,docker_image,namespace)
-      {
-        jenkins.sh """
+    def aksdeploy(filename, docker_image, namespace)
+    {
+       jenkins.sh """
+      echo "Executing AKS deploy"
+    
+       sed -i "s|DIT|${docker_image}|g" ./.cicd/${filename}
+    
+       if kubectl apply -f ./.cicd/${filename} -n ${namespace}; then
+        echo "Deployment succeeded in namespace ${namespace}"
+      else
+         echo "OPPS! Namespace ${namespace} is not there!!!"
+         echo "Creating the namespace ${namespace}"
+         kubectl create namespace ${namespace}
+         echo "Deploying the deployment in ${namespace}"
+         kubectl apply -f ./.cicd/${filename} -n ${namespace}
+      fi
+      """
+    }
 
-        echo " executing aks deploy "
-
-        
-        sed -i "s|DIT|${docker_image}|g" ./.cicd/${filename}  
-        kubectl apply -f ./.cicd/${filename} -n ${namespace}
-
-        """
-      }
-
+      
 
 
 }
