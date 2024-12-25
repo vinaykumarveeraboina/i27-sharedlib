@@ -17,6 +17,7 @@ def call(Map pipelineParams)
         label 'k8s-slave'
     }
     parameters {
+        choice(name: 'k8Login', choices: 'NO\nYES', description: "This will only build the application")
         choice(name: 'buildOnly', choices: 'NO\nYES', description: "This will only build the application")
         choice(name: 'scanOnly', choices: 'NO\nYES', description: "This will only SCAN the application")
         choice(name: 'dockerpush', choices: 'NO\nYES', description: "This will build the application, Docker Build, and Docker push")
@@ -45,6 +46,11 @@ def call(Map pipelineParams)
     stages {
         stage('Authenticate to AKS')
         {
+            when{
+                anyOf{
+                    expression{params.k8Login == 'YES'}
+                }
+            }
             steps{
 
                 echo " executing in AKS "
@@ -225,7 +231,7 @@ def imagevalidation(build) {
     } catch (Exception e) {
         println( " *******************   OOPS! Image with this tag is not available  ************************* ")
         println("*********************** Building Application  *****************************************")
-        k8s.applicationBuild(env.APPLICATION_NAME)
+        build.applicationBuild(env.APPLICATION_NAME)
         println("*********************** Image build and push to Hub  *****************************************")
         dockerBuildPush()
     }
