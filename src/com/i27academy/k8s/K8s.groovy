@@ -28,6 +28,8 @@ class K8s {
 
         echo " executing aks deploy "
 
+        kubectl apply -f ./cicd/.k8s_dev.yaml
+
         """
       }
 
