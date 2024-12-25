@@ -1,256 +1,193 @@
 import com.i27academy.builds.Javabuild
 import com.i27academy.k8s.K8s
 
+def call(Map pipelineParams) {
+    Javabuild build = new Javabuild(this)
+    K8s k8s = new K8s(this)
 
-def call(Map pipelineParams)
-{
-  Javabuild build = new Javabuild(this)
-  K8s k8s = new K8s(this)
-
-  // will write entire pipeline here 
-
-  // This Jenkinsfile is for eureka deployment
-
- pipeline
- {
-    agent {
-        label 'k8s-slave'
-    }
-    parameters {
-        choice(name: 'k8Login', choices: 'NO\nYES', description: "This will only build the application")
-        choice(name: 'buildOnly', choices: 'NO\nYES', description: "This will only build the application")
-        choice(name: 'scanOnly', choices: 'NO\nYES', description: "This will only SCAN the application")
-        choice(name: 'dockerpush', choices: 'NO\nYES', description: "This will build the application, Docker Build, and Docker push")
-        choice(name: 'deployToDev', choices: 'NO\nYES', description: "This will deploy the app to Dev")
-        choice(name: 'deployToTest', choices: 'NO\nYES', description: "This will deploy the app to Test")
-        choice(name: 'deployToStage', choices: 'NO\nYES', description: "This will deploy the app to Stage")
-    }
-    options {
-        buildDiscarder(logRotator(daysToKeepStr: '7', numToKeepStr: '5'))
-    }
-    environment {
-        DOCKERHUB = "docker.io/vinaykumarveeraboina"
-
-        APPLICATION_NAME = "${pipelineparams.appName}"
-        //APPLICATION_NAME = 'eureka'
-        POM_VERSION = readMavenPom().getVersion()
-        POM_PACKAGING = readMavenPom().getPackaging()
-        DOCKER_CREDS = credentials('DockerHub')
-        SONAR_URL = 'http://20.6.130.89:9000'
-        SONAR_TOKEN = credentials('sonar')
-    }
-    tools {
-        maven 'maven-3.8.8'
-        jdk 'Jdk17'
-    }
-    stages {
-        stage('Authenticate to AKS')
-        {
-            when{
-                anyOf{
-                    expression{params.k8Login == 'YES'}
-                }
-            }
-            steps{
-
-                echo " executing in AKS "
-                script {
-                k8s.akslogin()
-                }
-
-            }
+    pipeline {
+        agent {
+            label 'k8s-slave'
         }
-        stage('Build') {
-            when {
-                anyOf {
-                    expression { params.buildOnly == 'YES' }
-                    expression { params.dockerpush == 'YES' }
-                }
-            }
-            steps {
-                script {
-                   k8s.applicationBuild(env.APPLICATION_NAME)
-                }
-            }
+        parameters {
+            choice(name: 'k8Login', choices: 'NO\nYES', description: "This will log in to Kubernetes")
+            choice(name: 'buildOnly', choices: 'NO\nYES', description: "This will only build the application")
+            choice(name: 'scanOnly', choices: 'NO\nYES', description: "This will only SCAN the application")
+            choice(name: 'dockerpush', choices: 'NO\nYES', description: "This will build, Dockerize, and push the app")
+            choice(name: 'deployToDev', choices: 'NO\nYES', description: "This will deploy the app to Dev")
+            choice(name: 'deployToTest', choices: 'NO\nYES', description: "This will deploy the app to Test")
+            choice(name: 'deployToStage', choices: 'NO\nYES', description: "This will deploy the app to Stage")
         }
-        stage('Unit-Test') {
-            when {
-                anyOf {
-                    expression { params.buildOnly == 'YES' }
-                    expression { params.dockerpush == 'YES' }
-                }
-            }
-            steps {
-                echo "Testing the ${env.APPLICATION_NAME} application"
-                sh "mvn test"
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
-            }
+        options {
+            buildDiscarder(logRotator(daysToKeepStr: '7', numToKeepStr: '5'))
         }
-        stage('Sonar_Test') {
-            when {
-                anyOf {
+        environment {
+            DOCKERHUB = "docker.io/vinaykumarveeraboina"
+            APPLICATION_NAME = "${pipelineParams.appName ?: 'default-app'}"
+            POM_VERSION = readMavenPom().getVersion()
+            POM_PACKAGING = readMavenPom().getPackaging()
+            DOCKER_CREDS = credentials('DockerHub')
+            SONAR_URL = 'http://20.6.130.89:9000'
+            SONAR_TOKEN = credentials('sonar')
+            GIT_COMMIT = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+        }
+        tools {
+            maven 'maven-3.8.8'
+            jdk 'Jdk17'
+        }
+        stages {
+            stage('Authenticate to AKS') {
+                when {
+                    expression { params.k8Login == 'YES' }
+                }
+                steps {
+                    echo "Authenticating with AKS"
+                    script {
+                        k8s.akslogin()
+                    }
+                }
+            }
+            stage('Build') {
+                when {
+                    anyOf {
+                        expression { params.buildOnly == 'YES' }
+                        expression { params.dockerpush == 'YES' }
+                    }
+                }
+                steps {
+                    script {
+                        k8s.applicationBuild(env.APPLICATION_NAME)
+                    }
+                }
+            }
+            stage('Unit-Test') {
+                when {
+                    anyOf {
+                        expression { params.buildOnly == 'YES' }
+                        expression { params.dockerpush == 'YES' }
+                    }
+                }
+                steps {
+                    echo "Testing the ${env.APPLICATION_NAME} application"
+                    sh "mvn test"
+                }
+                post {
+                    always {
+                        junit 'target/surefire-reports/*.xml'
+                    }
+                }
+            }
+            stage('Sonar_Test') {
+                when {
                     expression { params.scanOnly == 'YES' }
                 }
-            }
-            steps {
-                echo " ************************* STARTING SONAR ANALYSIS with Quality gate ************************"
-                withSonarQubeEnv('SonarQube') {
-                    sh """
-                    mvn clean verify sonar:sonar \
-                     -Dsonar.projectKey=i127-eureka \
-                     -Dsonar.host.url=${env.SONAR_URL} \
-                     -Dsonar.login=${SONAR_TOKEN}
-                     """
+                steps {
+                    echo "Starting SonarQube analysis"
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                        mvn clean verify sonar:sonar \
+                        -Dsonar.projectKey=i127-eureka \
+                        -Dsonar.host.url=${env.SONAR_URL} \
+                        -Dsonar.login=${SONAR_TOKEN}
+                        """
+                    }
+                    timeout(time: 5, unit: 'MINUTES') {
+                        waitForQualityGate abortPipeline: true
+                    }
                 }
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
             }
-        }
-        /*stage('Docker-Format') {
-            steps {
-                echo "ACTUAL_FORMAT: ${APPLICATION_NAME}-${POM_VERSION}.${POM_PACKAGING}"
-                echo "CUSTOM_FORMAT: ${APPLICATION_NAME}-${currentBuild.number}-${BRANCH_NAME}.${POM_PACKAGING}"
-            }
-        }*/
-        stage('Docker Build and Push') {
-            when {
-                anyOf {
+            stage('Docker Build and Push') {
+                when {
                     expression { params.dockerpush == 'YES' }
                 }
-            }
-            steps {
-                script {
-                    dockerBuildPush()
+                steps {
+                    script {
+                        dockerBuildPush()
+                    }
                 }
             }
-        }
-        stage('Docker deploy to DEV') {
-            when {
-                anyOf {
+            stage('Docker Deploy to DEV') {
+                when {
                     expression { params.deployToDev == 'YES' }
                 }
-            }
-            steps {
-                script {
-                    imagevalidation()
-                    DockerDeploy('dev', '5761', '8761')
+                steps {
+                    script {
+                        imageValidation(build)
+                        DockerDeploy('dev', '5761', '8761')
+                    }
                 }
             }
-        }
-        stage('Docker deploy to TEST env') {
-            when {
-                anyOf {
+            stage('Docker Deploy to TEST') {
+                when {
                     expression { params.deployToTest == 'YES' }
                 }
+                steps {
+                    script {
+                        imageValidation(build)
+                        DockerDeploy('test', '6761', '8761')
+                    }
+                }
             }
-            steps {
-                script {
-                    imagevalidation()
-                    DockerDeploy('test', '6761', '8761')
+            stage('Docker Deploy to STAGE') {
+                when {
+                    allOf {
+                        expression { params.deployToStage == 'YES' }
+                        branch 'release/*'
+                    }
+                }
+                steps {
+                    timeout(time: 300, unit: 'SECONDS') {
+                        input message: "Deploying ${env.APPLICATION_NAME} to stage?", ok: 'YES', submitter: 'owner'
+                    }
+                    script {
+                        imageValidation(build)
+                        DockerDeploy('stage', '7761', '8761')
+                    }
+                }
+            }
+            stage('Clean Workspace') {
+                steps {
+                    cleanWs()
                 }
             }
         }
-        stage('Docker deploy to STAGE env') {
-            when {
-              allOf{
-                  //this will execute when the branch is release and deployToStage==yes 
-
-                anyOf {
-                    expression { params.deployToStage == 'YES' }
-                }
-                anyOf {
-                     branch 'release/*' 
-                }
-            }
-            }
-            steps {
-               timeout( time :300, unit :'SECONDS'){
-               input message : " Deploying  ${env.APPLICATION_NAME} to stage ??? " , ok :'YES', submitter : 'owner'
-               }
-                script {
-                    imagevalidation(build)
-                    DockerDeploy('stage', '7761', '8761')
-                }
-            }
-        }
-
-        stage (' Clean Workspace ') {
-
-          steps{
-            cleanWs()
-          }
-        }
-    }
- }}
-
-
-// This method is developed for deploying our app in different environments
-def DockerDeploy(envdeploy, hostport, contport) {
-    echo "************************ Deploying to Docker $envdeploy ********************************"
-
-    withCredentials([usernamePassword(credentialsId: 'docker_dev_server', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-        echo "****************** PULLING the container from docker hub ********************"
-        sh """
-        sshpass -p ${env.PASSWORD} ssh -o StrictHostKeyChecking=no ${env.USERNAME}@${env.docker_dev_server} docker pull ${env.DOCKERHUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}
-        """
-        script {
-            try {
-                echo "****************** Stopping the container ********************"
-                sh """
-                sshpass -p ${env.PASSWORD} ssh -o StrictHostKeyChecking=no ${env.USERNAME}@${env.docker_dev_server} docker stop ${env.APPLICATION_NAME}-$envdeploy
-                """
-
-                echo "****************** Removing the container ********************"
-                sh """
-                sshpass -p ${env.PASSWORD} ssh -o StrictHostKeyChecking=no ${env.USERNAME}@${env.docker_dev_server} docker rm ${env.APPLICATION_NAME}-$envdeploy
-                """
-            } catch (err) {
-                echo "Caught the Error: ${err}"
-            }
-        }
-
-        echo "**************** Running the container *****************"
-        sh """
-        sshpass -p ${env.PASSWORD} ssh -o StrictHostKeyChecking=no ${env.USERNAME}@${env.docker_dev_server} docker run -d -p $hostport:$contport --name ${env.APPLICATION_NAME}-$envdeploy ${env.DOCKERHUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}
-        """
     }
 }
 
-def imagevalidation(build) {
-    
-    println(" **********************  pulling the docker image *******************************")
+// Helper functions
+def DockerDeploy(envDeploy, hostPort, containerPort) {
+    echo "Deploying to Docker $envDeploy"
+    withCredentials([usernamePassword(credentialsId: 'docker_dev_server', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+        try {
+            sh """
+            sshpass -p ${env.PASSWORD} ssh -o StrictHostKeyChecking=no ${env.USERNAME}@${env.docker_dev_server} docker pull ${env.DOCKERHUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}
+            sshpass -p ${env.PASSWORD} ssh -o StrictHostKeyChecking=no ${env.USERNAME}@${env.docker_dev_server} docker stop ${env.APPLICATION_NAME}-$envDeploy || true
+            sshpass -p ${env.PASSWORD} ssh -o StrictHostKeyChecking=no ${env.USERNAME}@${env.docker_dev_server} docker rm ${env.APPLICATION_NAME}-$envDeploy || true
+            sshpass -p ${env.PASSWORD} ssh -o StrictHostKeyChecking=no ${env.USERNAME}@${env.docker_dev_server} docker run -d -p $hostPort:$containerPort --name ${env.APPLICATION_NAME}-$envDeploy ${env.DOCKERHUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}
+            """
+        } catch (err) {
+            echo "Error during Docker deployment: ${err}"
+            throw err
+        }
+    }
+}
+
+def imageValidation(build) {
     try {
-        sh """
-        docker pull ${env.DOCKERHUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}
-        """
+        sh "docker pull ${env.DOCKERHUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
     } catch (Exception e) {
-        println( " *******************   OOPS! Image with this tag is not available  ************************* ")
-        println("*********************** Building Application  *****************************************")
+        echo "Image not found. Building and pushing the image."
         build.applicationBuild(env.APPLICATION_NAME)
-        println("*********************** Image build and push to Hub  *****************************************")
         dockerBuildPush()
     }
 }
 
-
-
-// This function will build the image and push to docker hub
 def dockerBuildPush() {
     sh """
-    ls -la
-    cp ${workspace}/target/i27-${env.APPLICATION_NAME}-${POM_VERSION}.${POM_PACKAGING} ./.cicd
-    ls -la ./.cicd
-    echo "*********************** Building Docker Image *********************************"
-    docker build --force-rm --no-cache --pull --rm=true --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${POM_VERSION}.${POM_PACKAGING} -t ${env.DOCKERHUB}/${env.APPLICATION_NAME}:${GIT_COMMIT} ./.cicd
-    docker images
-    echo "***************** Docker login ************************"
+    mkdir -p .cicd
+    cp target/i27-${env.APPLICATION_NAME}-${POM_VERSION}.${POM_PACKAGING} .cicd/
+    docker build --force-rm --no-cache --pull --rm=true --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${POM_VERSION}.${POM_PACKAGING} -t ${env.DOCKERHUB}/${env.APPLICATION_NAME}:${GIT_COMMIT} .cicd
     docker login -u ${DOCKER_CREDS_USR} -p ${DOCKER_CREDS_PSW}
-    echo "********************* Docker push *************************************"
     docker push ${env.DOCKERHUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}
     """
 }
