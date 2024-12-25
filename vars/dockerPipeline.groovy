@@ -91,7 +91,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        build.dockerBuildPush()
+                        dockerBuildPush()
                     }
                 }
             }
@@ -103,8 +103,8 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        build.imagevalidation()
-                        build.DockerDeploy('dev', '5761', '8761')
+                        imagevalidation(build)
+                        DockerDeploy('dev', '5761', '8761')
                     }
                 }
             }
@@ -116,8 +116,8 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        build.imagevalidation()
-                        build.DockerDeploy('test', '6761', '8761')
+                        imagevalidation(build)
+                        DockerDeploy('test', '6761', '8761')
                     }
                 }
             }
@@ -137,8 +137,8 @@ def call(Map pipelineParams) {
                        input message: " Deploying ${env.APPLICATION_NAME} to stage??? ", ok: 'YES', submitter: 'owner'
                    }
                     script {
-                        build.imagevalidation()
-                        build.DockerDeploy('stage', '7761', '8761')
+                        imagevalidation(build)
+                        DockerDeploy('stage', '7761', '8761')
                     }
                 }
             }
@@ -183,7 +183,7 @@ def DockerDeploy(envdeploy, hostport, contport) {
     }
 }
 
-def imagevalidation() {
+def imagevalidation(build) {
     println(" **********************  pulling the docker image *******************************")
     try {
         sh """
