@@ -154,11 +154,11 @@ def call(Map pipelineParams) {
                     }
                 }
             }
-            stage('Clean Workspace') {
+            /*stage('Clean Workspace') {
                 steps {
                     cleanWs()
                 }
-            }
+            }*/
         }
     }
 }
