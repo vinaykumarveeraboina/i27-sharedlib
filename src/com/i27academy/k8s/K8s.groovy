@@ -6,7 +6,7 @@ class K8s {
         this.jenkins = jenkins
     }
 
-   //we will write all the kubernets related files here 
+   //we will write alsl the kubernets related files here 
 
       def akslogin()
       
