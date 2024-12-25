@@ -41,7 +41,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        build.applicationBuild(env.APPLICATION_NAME).call()
+                        build.applicationBuild(env.APPLICATION_NAME)
                     }
                 }
             }
@@ -91,7 +91,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        dockerBuildPush().call()
+                        dockerBuildPush()
                     }
                 }
             }
@@ -103,8 +103,8 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        imagevalidation().call()
-                        DockerDeploy('dev', '5761', '8761').call()
+                        imagevalidation(build)
+                        DockerDeploy('dev', '5761', '8761')
                     }
                 }
             }
@@ -116,8 +116,8 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        imagevalidation().call()
-                        DockerDeploy('test', '6761', '8761').call()
+                        imagevalidation(build)
+                        DockerDeploy('test', '6761', '8761')
                     }
                 }
             }
@@ -183,7 +183,7 @@ def DockerDeploy(envdeploy, hostport, contport) {
     }
 }
 
-def imagevalidation() {
+def imagevalidation(build) {
     println(" **********************  pulling the docker image *******************************")
     try {
         sh """
@@ -192,9 +192,9 @@ def imagevalidation() {
     } catch (Exception e) {
         println( " *******************   OOPS! Image with this tag is not available  ************************* ")
         println("*********************** Building Application  *****************************************")
-        build.applicationBuild(env.APPLICATION_NAME).call()
+        build.applicationBuild(env.APPLICATION_NAME)
         println("*********************** Image build and push to Hub  *****************************************")
-        dockerBuildPush().call()
+        dockerBuildPush()
     }
 }
 
