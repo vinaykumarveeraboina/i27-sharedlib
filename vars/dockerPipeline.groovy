@@ -104,7 +104,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         imagevalidation().call()
-                        DockerDeploy('dev', '5761', '8761')
+                        DockerDeploy('dev', '5761', '8761').call()
                     }
                 }
             }
