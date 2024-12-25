@@ -35,6 +35,7 @@ def call(Map pipelineParams) {
             AZURE_SUBSCRIPTION_ID = credentials('azure-subscription-id')
             RESOURCE_GROUP = 'project'
             AKS_CLUSTER_NAME = 'i27project'
+            K8S_DEV_FILE = "k8s_dev.yaml"
         }
         tools {
             maven 'maven-3.8.8'
@@ -120,8 +121,9 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         imageValidation(build)
+                        def docker_image = "${env.DOCKERHUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
                         k8s.akslogin(env.AZURE_CLIENT_ID,env.AZURE_CLIENT_SECRET,env.AZURE_TENANT_ID,env.AZURE_SUBSCRIPTION_ID,env.RESOURCE_GROUP,env.AKS_CLUSTER_NAME)
-                        k8s.aksdeploy()
+                        k8s.aksdeploy("${env.K8S_DEV_FILE}",docker_image)
                        //DockerDeploy('dev', '5761', '8761')
                     }
                 }
