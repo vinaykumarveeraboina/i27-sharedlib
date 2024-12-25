@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata: 
+  name: {{.Values.name }}    #i27-eureka-dev
+spec: 
+  replicas: {{.Values.replicas.default}}
+  selector:
+    matchLabels:
+      name: {{.Values.name }} 
+  template:
+    metadata:
+      labels:
+        name: {{.Values.name }} 
+    spec:
+      containers:
+        - name: {{.Values.name }} 
+        # what image should i place here ????/
+          image: DIT
+          resources:
+            requests: 
+              memory: {{.Values.req_memory}}
+              cpu: {{.Values.req_cpu}}
+            limits: 
+              memory: {{.Values.limit_memory}}
+              cpu: {{.Values.limit_cpu}}
