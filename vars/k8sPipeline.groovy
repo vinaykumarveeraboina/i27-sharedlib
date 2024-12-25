@@ -23,13 +23,12 @@ def call(Map pipelineParams) {
         }
         environment {
             DOCKERHUB = "docker.io/vinaykumarveeraboina"
-            APPLICATION_NAME = "${pipelineParams.appName ?: 'default-app'}"
+            APPLICATION_NAME = "${pipelineParams.appName}"
             POM_VERSION = readMavenPom().getVersion()
             POM_PACKAGING = readMavenPom().getPackaging()
             DOCKER_CREDS = credentials('DockerHub')
             SONAR_URL = 'http://20.6.130.89:9000'
             SONAR_TOKEN = credentials('sonar')
-            GIT_COMMIT = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
         }
         tools {
             maven 'maven-3.8.8'
