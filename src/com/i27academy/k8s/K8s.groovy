@@ -22,7 +22,7 @@ class K8s {
 
       }
 
-      def aksdeploy(filename,docker_image)
+      def aksdeploy(filename,docker_image,namespace)
       {
         jenkins.sh """
 
@@ -30,7 +30,7 @@ class K8s {
 
         
         sed -i "s|DIT|${docker_image}|g" ./.cicd/${filename}  
-        kubectl apply -f ./.cicd/${filename}
+        kubectl apply -f ./.cicd/${filename} -n ${namespace}
 
         """
       }
