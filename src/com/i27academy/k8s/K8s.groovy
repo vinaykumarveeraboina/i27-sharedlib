@@ -22,16 +22,19 @@ class K8s {
 
       }
 
-      def aksdeploy()
+      def aksdeploy(filename,docker_image)
       {
         jenkins.sh """
 
         echo " executing aks deploy "
 
-        kubectl apply -f ./.cicd/k8s_dev.yaml
+        
+        sed -i "s|DIT|${docker_image}|g" ./.cicd/${filename}  
+        kubectl apply -f ./.cicd/${filename}
 
         """
       }
+
 
 
 }
