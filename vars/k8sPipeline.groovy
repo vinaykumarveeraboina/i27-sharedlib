@@ -243,10 +243,10 @@ def imagevalidation(build) {
 def dockerBuildPush() {
     sh """
     ls -la
-    cp ${workspace}/target/i27-${APPLICATION_NAME}-${POM_VERSION}.${POM_PACKAGING} ./.cicd
+    cp ${workspace}/target/i27-${env.APPLICATION_NAME}-${POM_VERSION}.${POM_PACKAGING} ./.cicd
     ls -la ./.cicd
     echo "*********************** Building Docker Image *********************************"
-    docker build --force-rm --no-cache --pull --rm=true --build-arg JAR_SOURCE=i27-${APPLICATION_NAME}-${POM_VERSION}.${POM_PACKAGING} -t ${env.DOCKERHUB}/${env.APPLICATION_NAME}:${GIT_COMMIT} ./.cicd
+    docker build --force-rm --no-cache --pull --rm=true --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${POM_VERSION}.${POM_PACKAGING} -t ${env.DOCKERHUB}/${env.APPLICATION_NAME}:${GIT_COMMIT} ./.cicd
     docker images
     echo "***************** Docker login ************************"
     docker login -u ${DOCKER_CREDS_USR} -p ${DOCKER_CREDS_PSW}
