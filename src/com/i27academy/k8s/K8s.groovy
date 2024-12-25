@@ -8,16 +8,21 @@ class K8s {
 
    //we will write alsl the kubernets related files here 
 
-      def akslogin()
+      def akslogin(AZURE_CLIENT_ID,AZURE_CLIENT_SECRET,AZURE_TENANT_ID,AZURE_SUBSCRIPTION_ID,RESOURCE_GROUP,AKS_CLUSTER_NAME)
       
      {
                     jenkins.sh """
                     
-                            az login --service-principal -u e174eda7-af95-4e7b-a3dc-c7b307f19ac5 -p WVQ8Q~PwIQ_R.Lt8dJSFN5iS2XacHPTwBIVnkaMP --tenant cf10d2ad-2334-4fc8-81da-b44a26739199
-                            az account set --subscription b056fb7b-25fb-4735-9bd4-39d1c66b6e5a
-
+                            az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${AZURE_TENANT_ID}
+                            az account set --subscription ${AZURE_SUBSCRIPTION_ID}
+                            az aks get-credentials --resource-group ${RESOURCE_GROUP} --name ${AKS_CLUSTER_NAME} --overwrite-existing
+                            kubectl get nodes
 
                         """
 
-}
+      }
+
+
+
+
 }
