@@ -8,7 +8,7 @@ class K8s {
 
    //we will write alsl the kubernets related files here 
 
-      def akslogin(AZURE_CLIENT_ID,AZURE_CLIENT_SECRET,AZURE_TENANT_ID,AZURE_SUBSCRIPTION_ID,RESOURCE_GROUP,AKS_CLUSTER_NAME)
+      def akslogin(String AZURE_CLIENT_ID,String AZURE_CLIENT_SECRET,String AZURE_TENANT_ID,String AZURE_SUBSCRIPTION_ID,String RESOURCE_GROUP,String AKS_CLUSTER_NAME)
       
      {
                     jenkins.sh """
