@@ -63,7 +63,7 @@ def call(Map pipelineParams)
             }
             steps {
                 script {
-                   build.applicationBuild(env.APPLICATION_NAME)
+                   k8s.applicationBuild(env.APPLICATION_NAME)
                 }
             }
         }
@@ -225,7 +225,7 @@ def imagevalidation(build) {
     } catch (Exception e) {
         println( " *******************   OOPS! Image with this tag is not available  ************************* ")
         println("*********************** Building Application  *****************************************")
-        build.applicationBuild(env.APPLICATION_NAME)
+        k8s.applicationBuild(env.APPLICATION_NAME)
         println("*********************** Image build and push to Hub  *****************************************")
         dockerBuildPush()
     }
