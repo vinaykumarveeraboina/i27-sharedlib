@@ -29,6 +29,12 @@ def call(Map pipelineParams) {
             DOCKER_CREDS = credentials('DockerHub')
             SONAR_URL = 'http://20.6.130.89:9000'
             SONAR_TOKEN = credentials('sonar')
+            AZURE_CLIENT_ID = credentials('azure-client-id')   
+            AZURE_CLIENT_SECRET = credentials('azure-client-secret') 
+            AZURE_TENANT_ID = credentials('azure-tenant-id')   
+            AZURE_SUBSCRIPTION_ID = credentials('azure-subscription-id')
+            RESOURCE_GROUP = 'project'
+            AKS_CLUSTER_NAME = 'i27project'
         }
         tools {
             maven 'maven-3.8.8'
@@ -42,10 +48,12 @@ def call(Map pipelineParams) {
                 steps {
                     echo "Authenticating with AKS"
                     script {
-                        k8s.akslogin()
+             
+                        k8s.akslogin(env.AZURE_CLIENT_ID,env.AZURE_CLIENT_SECRET,env.AZURE_TENANT_ID,env.AZURE_SUBSCRIPTION_ID,env.RESOURCE_GROUP,AKS_CLUSTER_NAME)
                     }
                 }
             }
+
             stage('Build') {
                 when {
                     anyOf {
