@@ -1,0 +1,13 @@
+# Service 
+apiVersion: v1
+kind: Service
+metadata: 
+  name: i27-eureka-dev
+spec:  
+  selector: 
+    name: i27-eureka-dev
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8761
+  type: NodePort
