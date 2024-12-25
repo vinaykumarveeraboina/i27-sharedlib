@@ -120,7 +120,9 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         imageValidation(build)
-                        DockerDeploy('dev', '5761', '8761')
+                        k8s.akslogin(env.AZURE_CLIENT_ID,env.AZURE_CLIENT_SECRET,env.AZURE_TENANT_ID,env.AZURE_SUBSCRIPTION_ID,env.RESOURCE_GROUP,env.AKS_CLUSTER_NAME)
+                        k8s.aksdeploy()
+                       //DockerDeploy('dev', '5761', '8761')
                     }
                 }
             }
