@@ -12,7 +12,7 @@ class K8s {
       {
     
                     jenkins.sh """
-                    
+                            echo " ************************* logged in into AKS cluster   ******************** "
                             az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${AZURE_TENANT_ID}
                             az account set --subscription ${AZURE_SUBSCRIPTION_ID}
                             az aks get-credentials --resource-group ${RESOURCE_GROUP} --name ${AKS_CLUSTER_NAME} --overwrite-existing
@@ -28,7 +28,7 @@ class K8s {
 
         echo " executing aks deploy "
 
-        kubectl apply -f ./cicd/.k8s_dev.yaml
+        kubectl apply -f ./.cicd/k8s_dev.yaml
 
         """
       }
