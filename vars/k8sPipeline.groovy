@@ -56,7 +56,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        k8s.applicationBuild(env.APPLICATION_NAME)
+                        build.applicationBuild(env.APPLICATION_NAME)
                     }
                 }
             }
