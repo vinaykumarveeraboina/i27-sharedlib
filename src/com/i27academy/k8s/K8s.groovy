@@ -61,7 +61,7 @@ class K8s {
     jenkins.sh """
 
     echo " cloning shared library "
-    git clone -b master https://github.com/vinaykumarveeraboina/i27-sharedlib.git
+    git clone -b main https://github.com/vinaykumarveeraboina/i27-sharedlib.git
     echo " listing the files "
 
     ls -la 
