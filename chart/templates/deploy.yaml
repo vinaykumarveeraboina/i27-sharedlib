@@ -15,5 +15,5 @@ spec:
       containers:
         - name: {{.Values.name }} 
         # what image should i place here ????/
-          image: DIT
+          image: "{{.Values.image.name }}:{{ .Values.image.tag }}"
           
