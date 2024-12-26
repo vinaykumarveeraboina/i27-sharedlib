@@ -2,12 +2,12 @@
 apiVersion: v1
 kind: Service
 metadata: 
-  name: i27-eureka-dev
+  name: {{.Values.fullname }}
 spec:  
   selector: 
-    name: i27-eureka-dev
+    name: {{.Values.name }}
   ports:
   - protocol: TCP
     port: 80
-    targetPort: 8761
+    targetPort: {{.Values.targetPort}}
   type: NodePort

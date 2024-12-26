@@ -37,12 +37,24 @@ def call(Map pipelineParams) {
             AKS_CLUSTER_NAME = 'i27project'
             K8S_DEV_FILE = "k8s_dev.yaml"
             K8S_DEV_NAMESPACE = "eureka-dev-ns"
+            HELM_PATH = "${workspace}/i27-shared-lib/chart"
+            DEV_ENV = "dev"
+            TST_ENV = "tst"
+            STAGE_ENV = "stage"
+            PROD_ENV = "prd"
         }
         tools {
             maven 'maven-3.8.8'
             jdk 'Jdk17'
         }
         stages {
+            stage('Git checkout')
+            {
+                steps{
+
+                    def gitclone()
+                }
+            }
             stage('Authenticate to AKS') {
                 when {
                     expression { params.k8Login == 'YES' }
@@ -124,8 +136,10 @@ def call(Map pipelineParams) {
                         imageValidation(build)
                         def docker_image = "${env.DOCKERHUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
                         k8s.akslogin(env.AZURE_CLIENT_ID,env.AZURE_CLIENT_SECRET,env.AZURE_TENANT_ID,env.AZURE_SUBSCRIPTION_ID,env.RESOURCE_GROUP,env.AKS_CLUSTER_NAME)
-                        k8s.aksdeploy("${env.K8S_DEV_FILE}",docker_image,"${env.K8S_DEV_NAMESPACE}")
+                        //k8s.aksdeploy("${env.K8S_DEV_FILE}",docker_image,"${env.K8S_DEV_NAMESPACE}")
+                        k8s.k8sHelmChartDeploy("${env.APPLICATION_NAME}", "${env.DEV_ENV}", "${env.HELM_PATH}", "${GIT_COMMIT}", "${env.DEV_NAMESPACE}")
                        //DockerDeploy('dev', '5761', '8761')
+                        echo "Deployed to Dev Successfully"
                     }
                 }
             }

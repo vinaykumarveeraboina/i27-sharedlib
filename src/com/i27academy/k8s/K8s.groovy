@@ -41,7 +41,35 @@ class K8s {
       """
     }
 
-      
+    def k8sHelmChartDeploy(appName, env, helmChartPath, imageTag, namespace) 
+    {
+        jenkins.sh """
+        echo "********************* Entering into Helm Deployment Method *********************"
+        helm version
+        echo "Instlling the chart"
 
+
+
+        helm install ${appName}-${env}-chart -f ./.cicd/helm_values/values_${env}.yaml  ${helmChartPath} 
+        """
+
+     }
+
+
+   def gitclone()
+   {
+    jenkins.sh """
+
+    echo " cloning shared library "
+    git clone -b master https://github.com/vinaykumarveeraboina/i27-sharedlib.git
+    echo " listing the files "
+
+    ls -la 
+   echo " listing the files under i27shared repo "
+
+    ls -la i27-sharedlib/chart/
+
+    """
+   }
 
 }
