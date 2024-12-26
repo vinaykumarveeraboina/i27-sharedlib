@@ -52,7 +52,7 @@ def call(Map pipelineParams) {
             {
                 steps{
 
-                    def gitclone()
+                   k8s.gitclone()
                 }
             }
             stage('Authenticate to AKS') {
