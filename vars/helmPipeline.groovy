@@ -139,7 +139,7 @@ def call(Map pipelineParams) {
                         def docker_image = "${env.DOCKERHUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
                         k8s.akslogin(env.AZURE_CLIENT_ID,env.AZURE_CLIENT_SECRET,env.AZURE_TENANT_ID,env.AZURE_SUBSCRIPTION_ID,env.RESOURCE_GROUP,env.AKS_CLUSTER_NAME)
                         //k8s.aksdeploy("${env.K8S_DEV_FILE}",docker_image,"${env.K8S_DEV_NAMESPACE}")
-                        k8s.k8sHelmChartDeploy("${env.APPLICATION_NAME}", "${env.DEV_ENV}", "${env.HELM_PATH}")
+                        k8s.k8sHelmChartDeploy("${env.APPLICATION_NAME}", "${env.DEV_ENV}", "${env.HELM_PATH}","${K8S_DEV_NAMESPACE}")
                        //DockerDeploy('dev', '5761', '8761')
                         echo "Deployed to Dev Successfully"
                     }
