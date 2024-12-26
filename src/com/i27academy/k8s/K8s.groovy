@@ -54,12 +54,12 @@ class K8s {
         echo "************** chat ${appName}-${env}-chart exists , proceeding with the chat upgarde **************"
         
 
-        helm upgrade ${appName}-${env}-chart -f ./.cicd/k8s/values_${env}.yaml --set image.tag= ${image_tag} ${helmChartPath} -n ${namespace}
+        helm upgrade ${appName}-${env}-chart -f ./.cicd/k8s/values_${env}.yaml --set image.tag=${image_tag} ${helmChartPath} -n ${namespace}
 
         else 
         echo " chart does not exist "
         echo "Installing the chart"
-        helm install ${appName}-${env}-chart -f ./.cicd/k8s/values_${env}.yaml --set image.tag= ${image_tag} ${helmChartPath} -n ${namespace}
+        helm install ${appName}-${env}-chart -f ./.cicd/k8s/values_${env}.yaml --set image.tag=${image_tag} ${helmChartPath} -n ${namespace}
         
         fi 
         """
