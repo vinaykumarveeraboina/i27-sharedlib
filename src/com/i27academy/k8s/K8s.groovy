@@ -41,7 +41,7 @@ class K8s {
       """
     }
 
-    def k8sHelmChartDeploy(appName, env, helmChartPath, imageTag, namespace) 
+    def k8sHelmChartDeploy(appName, env, helmChartPath) 
     {
         jenkins.sh """
         echo "********************* Entering into Helm Deployment Method *********************"
@@ -50,7 +50,7 @@ class K8s {
 
 
 
-        helm install ${appName}-${env}-chart -f ./.cicd/helm_values/values_${env}.yaml  ${helmChartPath} 
+        helm install ${appName}-${env}-chart -f ./.cicd/k8s/values_${env}.yaml  ${helmChartPath} 
         """
 
      }
