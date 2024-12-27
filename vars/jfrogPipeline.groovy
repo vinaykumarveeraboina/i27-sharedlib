@@ -29,7 +29,7 @@ def call(Map pipelineParams) {
             POM_VERSION = readMavenPom().getVersion()
             POM_PACKAGING = readMavenPom().getPackaging()
             DOCKER_CREDS = credentials('DockerHub')
-            JFROG_CREDS = credentials('JFORG')
+            JFROG_CREDS = credentials('JFROG_CREDS')
             SONAR_URL = 'http://20.6.130.89:9000'
             SONAR_TOKEN = credentials('sonar')
             AZURE_CLIENT_ID = credentials('azure-client-id')   
