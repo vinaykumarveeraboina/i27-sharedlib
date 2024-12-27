@@ -206,7 +206,7 @@ def DockerDeploy(envDeploy, hostPort, containerPort) {
 
 def imageValidation(build) {
     try {
-        sh "docker login -u ${JFROG_CREDS_USR} -p ${JFROG_CREDS_PSW}"
+        sh "docker login -u ${JFROG_CREDS_USR} -p ${JFROG_CREDS_PSW}  i27project.jfrog.io"
         sh "docker pull ${env.JFROG_REPO}/${JFROG_REGISTRY}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
     } catch (Exception e) {
         echo "Image not found. Building and pushing the image."
@@ -220,7 +220,7 @@ def dockerBuildPush() {
     mkdir -p .cicd
     cp target/i27-${env.APPLICATION_NAME}-${POM_VERSION}.${POM_PACKAGING} .cicd/
     docker build --force-rm --no-cache --pull --rm=true --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${POM_VERSION}.${POM_PACKAGING} -t ${env.JFROG_REPO}/${JFROG_REGISTRY}/${env.APPLICATION_NAME}:${GIT_COMMIT} .cicd
-    docker login -u ${JFROG_CREDS_USR} -p ${JFROG_CREDS_PSW}
+    docker login -u ${JFROG_CREDS_USR} -p ${JFROG_CREDS_PSW}  i27project.jfrog.io
     docker push ${env.JFROG_REPO}/${JFROG_REGISTRY}/${env.APPLICATION_NAME}:${GIT_COMMIT}
     """
 }
