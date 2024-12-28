@@ -29,10 +29,7 @@ class K8shealthcheck {
 
                                      kubectl get nodes
 
-                            echo " *************************  k8s NAMESPACEs  ******************** "
-
-                                     kubectl get ns
-
+                                    
                         """
 
       }
