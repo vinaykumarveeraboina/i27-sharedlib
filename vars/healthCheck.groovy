@@ -35,15 +35,7 @@ def call(Map pipelineParams) {
             IMAGE_TAG = "${GIT_COMMIT}"
         }
         stages {
-            stage('Cleanup of i27-sharedlib before cloning') {
-                steps {
-                    script {
-                        dir("${workspace}") {
-                            sh 'rm -rf i27-sharedlib'
-                        }
-                    }
-                }
-            }
+            
 
             stage('DEV DETAILS') {
                 when {
