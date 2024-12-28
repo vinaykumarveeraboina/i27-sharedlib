@@ -36,9 +36,10 @@ def call(Map pipelineParams) {
             RESOURCE_GROUP = 'project'
             AKS_CLUSTER_NAME = 'i27project'
             K8S_DEV_FILE = "k8s_dev.yaml"
-            K8S_DEV_NAMESPACE = "eureka-dev-ns"
-            K8S_TST_NAMESPACE = "eureka-tst-ns"
-            K8S_STG_NAMESPACE = "eureka-stage-ns"
+            
+            K8S_DEV_NAMESPACE = "${env.APPLICATION_NAME}-dev-ns"
+            K8S_TST_NAMESPACE = "${env.APPLICATION_NAME}-tst-ns"
+            K8S_STG_NAMESPACE = "${env.APPLICATION_NAME}-stage-ns"
             HELM_PATH = "${workspace}/i27-sharedlib/chart"
             DEV_ENV = "dev"
             TST_ENV = "tst"
