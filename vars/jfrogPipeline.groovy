@@ -40,11 +40,14 @@ def call(Map pipelineParams) {
             AKS_CLUSTER_NAME = 'i27project'
             K8S_DEV_FILE = "k8s_dev.yaml"
             K8S_DEV_NAMESPACE = "eureka-dev-ns"
+            K8S_TST_NAMESPACE = "eureka-tst-ns"
+            K8S_STG_NAMESPACE = "eureka-stage-ns"
             HELM_PATH = "${workspace}/i27-sharedlib/chart"
             DEV_ENV = "dev"
             TST_ENV = "tst"
             STAGE_ENV = "stage"
             PROD_ENV = "prd"
+            IMAGE_TAG = "${GIT_COMMIT}"
         }
         tools {
             maven 'maven-3.8.8'
@@ -139,11 +142,11 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         imageValidation(build)
-                        // def docker_image = "${env.DOCKERHUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
-                        def jfrog_image = "${env.JFROG_REPO}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
+                        // def docker_image = "${env.DOCKERHUB}/${env.APPLICATION_NAME}:${IMAGE_TAG}"
+                        // def jfrog_image = "${env.JFROG_REPO}/${env.APPLICATION_NAME}:${IMAGE_TAG}"
                         k8s.akslogin(env.AZURE_CLIENT_ID,env.AZURE_CLIENT_SECRET,env.AZURE_TENANT_ID,env.AZURE_SUBSCRIPTION_ID,env.RESOURCE_GROUP,env.AKS_CLUSTER_NAME)
                         //k8s.aksdeploy("${env.K8S_DEV_FILE}",docker_image,"${env.K8S_DEV_NAMESPACE}")
-                        k8s.k8sHelmChartDeploy("${env.APPLICATION_NAME}", "${env.DEV_ENV}", "${env.HELM_PATH}","${K8S_DEV_NAMESPACE}","${GIT_COMMIT}")
+                        k8s.k8sHelmChartDeploy("${env.APPLICATION_NAME}", "${env.DEV_ENV}", "${env.HELM_PATH}","${K8S_DEV_NAMESPACE}","${IMAGE_TAG}")
                        //DockerDeploy('dev', '5761', '8761')
                         echo "Deployed to Dev Successfully"
                     }
@@ -155,8 +158,13 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        imageValidation(build)
-                        DockerDeploy('test', '6761', '8761')
+                        //imageValidation(build)
+                        // def jfrog_image = "${env.JFROG_REPO}/${env.APPLICATION_NAME}:${IMAGE_TAG}"
+                        k8s.akslogin(env.AZURE_CLIENT_ID,env.AZURE_CLIENT_SECRET,env.AZURE_TENANT_ID,env.AZURE_SUBSCRIPTION_ID,env.RESOURCE_GROUP,env.AKS_CLUSTER_NAME)
+                        //k8s.aksdeploy("${env.K8S_DEV_FILE}",docker_image,"${env.K8S_DEV_NAMESPACE}")
+                        k8s.k8sHelmChartDeploy("${env.APPLICATION_NAME}", "${env.TST_ENV}", "${env.HELM_PATH}","${K8S_TST_NAMESPACE}","${IMAGE_TAG}")
+                       //DockerDeploy('dev', '5761', '8761')
+                        echo "Deployed to Dev Successfully"
                     }
                 }
             }
@@ -172,8 +180,13 @@ def call(Map pipelineParams) {
                         input message: "Deploying ${env.APPLICATION_NAME} to stage?", ok: 'YES', submitter: 'owner'
                     }
                     script {
-                        imageValidation(build)
-                        DockerDeploy('stage', '7761', '8761')
+                         //imageValidation(build)
+                        // def jfrog_image = "${env.JFROG_REPO}/${env.APPLICATION_NAME}:${IMAGE_TAG}"
+                        k8s.akslogin(env.AZURE_CLIENT_ID,env.AZURE_CLIENT_SECRET,env.AZURE_TENANT_ID,env.AZURE_SUBSCRIPTION_ID,env.RESOURCE_GROUP,env.AKS_CLUSTER_NAME)
+                        //k8s.aksdeploy("${env.K8S_DEV_FILE}",docker_image,"${env.K8S_DEV_NAMESPACE}")
+                        k8s.k8sHelmChartDeploy("${env.APPLICATION_NAME}", "${env.TST_ENV}", "${env.HELM_PATH}","${K8S_TST_NAMESPACE}","${IMAGE_TAGIMAGE_TAG}")
+                       //DockerDeploy('dev', '5761', '8761')
+                        echo "Deployed to Dev Successfully"
                     }
                 }
             }
@@ -186,16 +199,16 @@ def call(Map pipelineParams) {
     }
 }
 
-// Helper functions
+// Helper functions to deploy the container into docker server 
 def DockerDeploy(envDeploy, hostPort, containerPort) {
     echo "Deploying to Docker $envDeploy"
     withCredentials([usernamePassword(credentialsId: 'docker_dev_server', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
         try {
             sh """
-            sshpass -p ${env.PASSWORD} ssh -o StrictHostKeyChecking=no ${env.USERNAME}@${env.docker_dev_server} docker pull ${env.DOCKERHUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}
+            sshpass -p ${env.PASSWORD} ssh -o StrictHostKeyChecking=no ${env.USERNAME}@${env.docker_dev_server} docker pull ${env.DOCKERHUB}/${env.APPLICATION_NAME}:${IMAGE_TAG}
             sshpass -p ${env.PASSWORD} ssh -o StrictHostKeyChecking=no ${env.USERNAME}@${env.docker_dev_server} docker stop ${env.APPLICATION_NAME}-$envDeploy || true
             sshpass -p ${env.PASSWORD} ssh -o StrictHostKeyChecking=no ${env.USERNAME}@${env.docker_dev_server} docker rm ${env.APPLICATION_NAME}-$envDeploy || true
-            sshpass -p ${env.PASSWORD} ssh -o StrictHostKeyChecking=no ${env.USERNAME}@${env.docker_dev_server} docker run -d -p $hostPort:$containerPort --name ${env.APPLICATION_NAME}-$envDeploy ${env.DOCKERHUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}
+            sshpass -p ${env.PASSWORD} ssh -o StrictHostKeyChecking=no ${env.USERNAME}@${env.docker_dev_server} docker run -d -p $hostPort:$containerPort --name ${env.APPLICATION_NAME}-$envDeploy ${env.DOCKERHUB}/${env.APPLICATION_NAME}:${IMAGE_TAG}
             """
         } catch (err) {
             echo "Error during Docker deployment: ${err}"
@@ -207,7 +220,7 @@ def DockerDeploy(envDeploy, hostPort, containerPort) {
 def imageValidation(build) {
     try {
         sh "docker login -u ${JFROG_CREDS_USR} -p ${JFROG_CREDS_PSW}  i27project.jfrog.io"
-        sh "docker pull ${env.JFROG_REPO}/${JFROG_REGISTRY}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
+        sh "docker pull ${env.JFROG_REPO}/${JFROG_REGISTRY}/${env.APPLICATION_NAME}:${IMAGE_TAG}"
     } catch (Exception e) {
         echo "Image not found. Building and pushing the image."
         build.applicationBuild(env.APPLICATION_NAME)
@@ -215,12 +228,13 @@ def imageValidation(build) {
     }
 }
 
+// this function will build the image and publish the image to jfrog dokcer degistry 
 def dockerBuildPush() {
     sh """
     mkdir -p .cicd
     cp target/i27-${env.APPLICATION_NAME}-${POM_VERSION}.${POM_PACKAGING} .cicd/
     docker build --force-rm --no-cache --pull --rm=true --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${POM_VERSION}.${POM_PACKAGING} -t ${env.JFROG_REPO}/${JFROG_REGISTRY}/${env.APPLICATION_NAME}:${GIT_COMMIT} .cicd
     docker login -u ${JFROG_CREDS_USR} -p ${JFROG_CREDS_PSW}  i27project.jfrog.io
-    docker push ${env.JFROG_REPO}/${JFROG_REGISTRY}/${env.APPLICATION_NAME}:${GIT_COMMIT}
+    docker push ${env.JFROG_REPO}/${JFROG_REGISTRY}/${env.APPLICATION_NAME}:${IMAGE_TAG}
     """
 }
