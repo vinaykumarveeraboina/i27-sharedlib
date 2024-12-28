@@ -25,9 +25,9 @@ class K8s {
     def aksdeploy(filename, docker_image, namespace)
     {
        jenkins.sh """
-      echo "Executing AKS deploy"
+       // echo "Executing AKS deploy"
     
-       sed -i "s|DIT|${docker_image}|g" ./.cicd/${filename}
+       // sed -i "s|DIT|${docker_image}|g" ./.cicd/${filename}
     
        if kubectl apply -f ./.cicd/${filename} -n ${namespace}; then
         echo "Deployment succeeded in namespace ${namespace}"
@@ -35,7 +35,7 @@ class K8s {
          echo "OPPS! Namespace ${namespace} is not there!!!"
 
          echo "Creating the namespace ${namespace}"
-         
+
          kubectl create namespace ${namespace}
          echo "Deploying the deployment in ${namespace}"
          kubectl apply -f ./.cicd/${filename} -n ${namespace}
@@ -43,9 +43,34 @@ class K8s {
       """
     }
 
-    def k8sHelmChartDeploy(appName, env, helmChartPath, namespace,image_tag) 
+
+    def nsvalidation(namespace)
     {
+       jenkins.sh """
+       
+    
+       if kubectl get ns ${namespace}; then
+        echo "Namespace ${namespace} EXISTS on the cluster"
+      else
+         echo "OPPS! Namespace ${namespace} is not there!!!"
+
+         echo "Creating the namespace ${namespace}"
+
+         kubectl create namespace ${namespace}
+         
+      fi
+      """
+    }
+     // Method to deploy Helm chart with namespace validation
+    def k8sHelmChartDeploy(appName, env, helmChartPath, namespace,image_tag) 
+    {   //Validate namespace before Helm deployment
+    
+        echo " validating the name space "
+        this.nsvalidation(namespace)
+
         jenkins.sh """
+        echo " validating the name space "
+        
         echo "********************* Entering into Helm Deployment Method *********************"
         helm version
 
