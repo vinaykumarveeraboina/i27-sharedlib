@@ -74,7 +74,7 @@ def call(Map pipelineParams) {
                     script {
                         
                         healthcheck.akslogin(env.AZURE_CLIENT_ID,env.AZURE_CLIENT_SECRET,env.AZURE_TENANT_ID,env.AZURE_SUBSCRIPTION_ID,env.RESOURCE_GROUP,env.AKS_CLUSTER_NAME)
-                         healthcheck.k8sobjectstatus(env.K8S_DEV_NAMESPACE)
+                         healthcheck.k8sobjectstatus("${env.K8S_DEV_NAMESPACE}")
                        
                     
                     }
@@ -97,7 +97,7 @@ def call(Map pipelineParams) {
                         
                         healthcheck.akslogin(env.AZURE_CLIENT_ID,env.AZURE_CLIENT_SECRET,env.AZURE_TENANT_ID,env.AZURE_SUBSCRIPTION_ID,env.RESOURCE_GROUP,env.AKS_CLUSTER_NAME)
 
-                        healthcheck.k8sobjectstatus(env.K8S_TST_NAMESPACE)
+                        healthcheck.k8sobjectstatus("${env.K8S_TST_NAMESPACE}")
                  
                  
                     }
@@ -120,7 +120,7 @@ def call(Map pipelineParams) {
                         
                         healthcheck.akslogin(env.AZURE_CLIENT_ID,env.AZURE_CLIENT_SECRET,env.AZURE_TENANT_ID,env.AZURE_SUBSCRIPTION_ID,env.RESOURCE_GROUP,env.AKS_CLUSTER_NAME)
 
-                        healthcheck.k8sobjectstatus(env.K8S_STAGE_NAMESPACE)
+                        healthcheck.k8sobjectstatus("${env.K8S_STAGE_NAMESPACE}")
 
                    
                    
