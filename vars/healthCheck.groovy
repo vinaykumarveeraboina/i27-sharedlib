@@ -49,16 +49,16 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        def devDetails = ""
+                
                         healthcheck.akslogin(env.AZURE_CLIENT_ID, env.AZURE_CLIENT_SECRET, env.AZURE_TENANT_ID, env.AZURE_SUBSCRIPTION_ID, env.RESOURCE_GROUP, env.AKS_CLUSTER_NAME)
                         healthcheck.k8snodestatus()
                         if (params.DISPLAY_EVERYTHING == 'YES') {
-                            devDetails += healthcheck.k8spsdr(env.K8S_DEV_NAMESPACE)
+                             healthcheck.k8spsdr(env.K8S_DEV_NAMESPACE)
                         }
                         if (params.K8S_POD_STATUS == 'YES') {
-                            devDetails += healthcheck.getPodStatus(env.K8S_DEV_NAMESPACE)
+                         healthcheck.getPodStatus(env.K8S_DEV_NAMESPACE)
                         }
-                        writeFile(file: 'dev_details.txt', text: devDetails)
+                      
                     }
                 }
             }
@@ -75,16 +75,16 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        def testDetails = ""
+                      
                         healthcheck.akslogin(env.AZURE_CLIENT_ID, env.AZURE_CLIENT_SECRET, env.AZURE_TENANT_ID, env.AZURE_SUBSCRIPTION_ID, env.RESOURCE_GROUP, env.AKS_CLUSTER_NAME)
                         healthcheck.k8snodestatus()
                         if (params.DISPLAY_EVERYTHING == 'YES') {
-                            testDetails += healthcheck.k8spsdr(env.K8S_TST_NAMESPACE)
+                            healthcheck.k8spsdr(env.K8S_TST_NAMESPACE)
                         }
                         if (params.K8S_POD_STATUS == 'YES') {
-                            testDetails += healthcheck.getPodStatus(env.K8S_TST_NAMESPACE)
+                            healthcheck.getPodStatus(env.K8S_TST_NAMESPACE)
                         }
-                        writeFile(file: 'test_details.txt', text: testDetails)
+                        
                     }
                 }
             }
@@ -101,16 +101,16 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        def stageDetails = ""
+                   
                         healthcheck.akslogin(env.AZURE_CLIENT_ID, env.AZURE_CLIENT_SECRET, env.AZURE_TENANT_ID, env.AZURE_SUBSCRIPTION_ID, env.RESOURCE_GROUP, env.AKS_CLUSTER_NAME)
                         healthcheck.k8snodestatus()
                         if (params.DISPLAY_EVERYTHING == 'YES') {
-                            stageDetails += healthcheck.k8spsdr(env.K8S_STG_NAMESPACE)
+                           healthcheck.k8spsdr(env.K8S_STG_NAMESPACE)
                         }
                         if (params.K8S_POD_STATUS == 'YES') {
-                            stageDetails += healthcheck.getPodStatus(env.K8S_STG_NAMESPACE)
+                          healthcheck.getPodStatus(env.K8S_STG_NAMESPACE)
                         }
-                        writeFile(file: 'stage_details.txt', text: stageDetails)
+                    
                     }
                 }
             }
