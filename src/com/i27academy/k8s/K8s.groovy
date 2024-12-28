@@ -33,7 +33,9 @@ class K8s {
         echo "Deployment succeeded in namespace ${namespace}"
       else
          echo "OPPS! Namespace ${namespace} is not there!!!"
+
          echo "Creating the namespace ${namespace}"
+         
          kubectl create namespace ${namespace}
          echo "Deploying the deployment in ${namespace}"
          kubectl apply -f ./.cicd/${filename} -n ${namespace}

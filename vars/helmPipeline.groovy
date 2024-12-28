@@ -37,6 +37,8 @@ def call(Map pipelineParams) {
             AKS_CLUSTER_NAME = 'i27project'
             K8S_DEV_FILE = "k8s_dev.yaml"
             K8S_DEV_NAMESPACE = "eureka-dev-ns"
+            K8S_TST_NAMESPACE = "eureka-tst-ns"
+            K8S_STG_NAMESPACE = "eureka-stage-ns"
             HELM_PATH = "${workspace}/i27-sharedlib/chart"
             DEV_ENV = "dev"
             TST_ENV = "tst"
@@ -152,7 +154,12 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         imageValidation(build)
-                        DockerDeploy('test', '6761', '8761')
+                        def docker_image = "${env.DOCKERHUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
+                        k8s.akslogin(env.AZURE_CLIENT_ID,env.AZURE_CLIENT_SECRET,env.AZURE_TENANT_ID,env.AZURE_SUBSCRIPTION_ID,env.RESOURCE_GROUP,env.AKS_CLUSTER_NAME)
+                        //k8s.aksdeploy("${env.K8S_DEV_FILE}",docker_image,"${env.K8S_DEV_NAMESPACE}")
+                        k8s.k8sHelmChartDeploy("${env.APPLICATION_NAME}", "${env.TST_ENV}", "${env.HELM_PATH}","${K8S_TST_NAMESPACE}","${GIT_COMMIT}")
+                       //DockerDeploy('dev', '5761', '8761')
+                        echo "Deployed to Dev Successfully"
                     }
                 }
             }
@@ -169,7 +176,12 @@ def call(Map pipelineParams) {
                     }
                     script {
                         imageValidation(build)
-                        DockerDeploy('stage', '7761', '8761')
+                        def docker_image = "${env.DOCKERHUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
+                        k8s.akslogin(env.AZURE_CLIENT_ID,env.AZURE_CLIENT_SECRET,env.AZURE_TENANT_ID,env.AZURE_SUBSCRIPTION_ID,env.RESOURCE_GROUP,env.AKS_CLUSTER_NAME)
+                        //k8s.aksdeploy("${env.K8S_DEV_FILE}",docker_image,"${env.K8S_DEV_NAMESPACE}")
+                        k8s.k8sHelmChartDeploy("${env.APPLICATION_NAME}", "${env.STAGE_ENV}", "${env.HELM_PATH}","${K8S_STG_NAMESPACE}","${GIT_COMMIT}")
+                       //DockerDeploy('dev', '5761', '8761')
+                        echo "Deployed to Dev Successfully"
                     }
                 }
             }
