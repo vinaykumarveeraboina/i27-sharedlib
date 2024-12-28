@@ -64,7 +64,7 @@ class K8s {
      // Method to deploy Helm chart with namespace validation
     def k8sHelmChartDeploy(appName, env, helmChartPath, namespace,image_tag) 
     {   //Validate namespace before Helm deployment
-       jenkins.sh """ echo "excuting the namespace validation method ${namespace}
+       jenkins.sh """ echo "excuting the namespace validation method ${namespace}"
        
        """
 
