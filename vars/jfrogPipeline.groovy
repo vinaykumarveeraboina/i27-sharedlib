@@ -162,7 +162,7 @@ def call(Map pipelineParams) {
                         //k8s.aksdeploy("${env.K8S_DEV_FILE}",docker_image,"${env.K8S_DEV_NAMESPACE}")
                         k8s.k8sHelmChartDeploy("${env.APPLICATION_NAME}", "${env.DEV_ENV}", "${env.HELM_PATH}","${K8S_DEV_NAMESPACE}","${IMAGE_TAG}")
                        //DockerDeploy('dev', '5761', '8761')
-                        echo "Deployed to ${env.STAGE_ENV} Successfully"
+                        echo "Deployed to ${env.DEV_ENV} Successfully"
                     }
                 }
             }
@@ -178,7 +178,7 @@ def call(Map pipelineParams) {
                         //k8s.aksdeploy("${env.K8S_DEV_FILE}",docker_image,"${env.K8S_DEV_NAMESPACE}")
                         k8s.k8sHelmChartDeploy("${env.APPLICATION_NAME}", "${env.TST_ENV}", "${env.HELM_PATH}","${K8S_TST_NAMESPACE}","${IMAGE_TAG}")
                        //DockerDeploy('dev', '5761', '8761')
-                        echo "Deployed to ${env.STAGE_ENV} Successfully"
+                        echo "Deployed to ${env.TST_ENV} Successfully"
                     }
                 }
             }
