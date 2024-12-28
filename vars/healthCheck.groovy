@@ -13,7 +13,7 @@ def call(Map pipelineParams) {
         parameters {
 
             
-            choice(name: 'NAMESPACE', choices: 'DEV\nTEST\n\STAGE', description: "This will Select NAMESPACE details on Kubernetes")
+            choice(name: 'NAMESPACE', choices: 'DEV\nTEST\nSTAGE', description: "This will Select NAMESPACE details on Kubernetes")
             choice(name: 'DISPLAY_EVERYTHING', choices: 'NO\nYES', description: "This will displays NS,DEPLOY,POD,SVC details Kubernetes")
             choice(name: 'K8S_POD_STATUS', choices: 'NO\nYES', description: "This will display POD_STATUS  on Kubernetes")
         }
