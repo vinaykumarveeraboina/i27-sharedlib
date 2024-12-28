@@ -43,18 +43,6 @@ def call(Map pipelineParams) {
 
         stages {
 
-               stage('cleanup of i27-sharedlib before cloning ')
-            {
-                steps{
-
-                script { 
-                    // Change to the workspace directory and remove i27-sharedlib directory 
-                    dir("${workspace}") {
-                    sh 'rm -rf i27-sharedlib'  
-                }
-            }
-                }
-            }
             stage('DEV DETAILS') {
                 when {
                     allOf { // All of these conditions must be true expression 
