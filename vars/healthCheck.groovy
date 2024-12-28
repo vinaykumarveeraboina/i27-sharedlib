@@ -123,7 +123,7 @@ def call(Map pipelineParams) {
                 when {
                     allOf { // All of these conditions must be true expression 
 
-                    expression { params.NAMESPACE == 'STGAE' }
+                    expression { params.NAMESPACE == 'STAGE' }
 
                     anyOf {
 
