@@ -12,10 +12,9 @@ def call(Map pipelineParams) {
         }
         parameters {
 
+            
+            choice(name: 'NAMESPACE', choices: 'DEV\nTEST\n\STAGE', description: "This will Select NAMESPACE details on Kubernetes")
             choice(name: 'DISPLAY_EVERYTHING', choices: 'NO\nYES', description: "This will displays NS,DEPLOY,POD,SVC details Kubernetes")
-            choice(name: 'NAMESPACE_DETAILS', choices: 'NO\nYES', description: "This will display NAMESPACE details on Kubernetes")
-            choice(name: 'K8S_SERVICE_DETAILS', choices: 'NO\nYES', description: "This will display Service details on Kubernetes")
-            choice(name: 'K8S_DEPLOYMENT_DETAILS', choices: 'NO\nYES', description: "This will display DEPLOYMENT details on Kubernetes")
             choice(name: 'K8S_POD_STATUS', choices: 'NO\nYES', description: "This will display POD_STATUS  on Kubernetes")
         }
         options {
@@ -56,72 +55,115 @@ def call(Map pipelineParams) {
             }
                 }
             }
-     
             stage('DEV DETAILS') {
-                 when {
+                when {
+                    allOf { // All of these conditions must be true expression 
+
+                    expression { params.NAMESPACE == 'DEV' }
+
                     anyOf {
+
                     expression { params.DISPLAY_EVERYTHING == 'YES' }
-                    expression { params.NAMESPACE_DETAILS == 'YES' }
-                    expression { params.K8S_DEPLOYMENT_DETAILS == 'YES'}
-                    expression { params.K8S_SERVICE_DETAILS == 'YES' }
+                    
                     expression { params.K8S_POD_STATUS == 'YES' }
 
 
                 }
+                    }
                  }
-
                 steps {
                     script {
                         
-                        healthcheck.akslogin(env.AZURE_CLIENT_ID,env.AZURE_CLIENT_SECRET,env.AZURE_TENANT_ID,env.AZURE_SUBSCRIPTION_ID,env.RESOURCE_GROUP,env.AKS_CLUSTER_NAME)
-                         healthcheck.k8sobjectstatus("${env.K8S_DEV_NAMESPACE}")
+                         healthcheck.akslogin(env.AZURE_CLIENT_ID,env.AZURE_CLIENT_SECRET,env.AZURE_TENANT_ID,env.AZURE_SUBSCRIPTION_ID,env.RESOURCE_GROUP,env.AKS_CLUSTER_NAME)
+
+                         healthcheck.k8snodestatus()
+
+                        if (params.DISPLAY_EVERYTHING == 'YES') 
+                        {
+                             healthcheck.k8spsdr(env.K8S_DEV_NAMESPACE) 
+                        } 
+                        if (params.K8S_POD_STATUS == 'YES') 
+                        { 
+                            healthcheck.getPodStatus(env.K8S_DEV_NAMESPACE)
+
+                        }
                        
-                    
+                   
+                   
                     }
                 }
             }
-            stage('TEST DETAILS') {
+             stage('TEST DETAILS') {
                 when {
+                    allOf { // All of these conditions must be true expression 
+
+                    expression { params.NAMESPACE == 'TEST' }
+
                     anyOf {
+
                     expression { params.DISPLAY_EVERYTHING == 'YES' }
-                    expression { params.NAMESPACE_DETAILS == 'YES' }
-                    expression { params.K8S_DEPLOYMENT_DETAILS == 'YES'}
-                    expression { params.K8S_SERVICE_DETAILS == 'YES' }
+                    
                     expression { params.K8S_POD_STATUS == 'YES' }
 
 
                 }
+                    }
                  }
                 steps {
                     script {
                         
                         healthcheck.akslogin(env.AZURE_CLIENT_ID,env.AZURE_CLIENT_SECRET,env.AZURE_TENANT_ID,env.AZURE_SUBSCRIPTION_ID,env.RESOURCE_GROUP,env.AKS_CLUSTER_NAME)
 
-                        healthcheck.k8sobjectstatus("${env.K8S_TST_NAMESPACE}")
-                 
-                 
+                         healthcheck.k8snodestatus()
+
+                        if (params.DISPLAY_EVERYTHING == 'YES') 
+                        {
+                             healthcheck.k8spsdr(env.K8S_TST_NAMESPACE) 
+                             } 
+                        if (params.K8S_POD_STATUS == 'YES') 
+                        { 
+                            healthcheck.getPodStatus(env.K8S_TST_NAMESPACE)
+
+                        }
+                       
+                   
+                   
                     }
                 }
             }
             stage('STAGE DETAILS') {
                 when {
+                    allOf { // All of these conditions must be true expression 
+
+                    expression { params.NAMESPACE == 'STGAE' }
+
                     anyOf {
+
                     expression { params.DISPLAY_EVERYTHING == 'YES' }
-                    expression { params.NAMESPACE_DETAILS == 'YES' }
-                    expression { params.K8S_DEPLOYMENT_DETAILS == 'YES'}
-                    expression { params.K8S_SERVICE_DETAILS == 'YES' }
+
                     expression { params.K8S_POD_STATUS == 'YES' }
 
 
                 }
+                    }
                  }
                 steps {
                     script {
                         
                         healthcheck.akslogin(env.AZURE_CLIENT_ID,env.AZURE_CLIENT_SECRET,env.AZURE_TENANT_ID,env.AZURE_SUBSCRIPTION_ID,env.RESOURCE_GROUP,env.AKS_CLUSTER_NAME)
 
-                        healthcheck.k8sobjectstatus("${env.K8S_STG_NAMESPACE}")
+                         healthcheck.k8snodestatus()
 
+                        if (params.DISPLAY_EVERYTHING == 'YES') 
+                        {
+                             healthcheck.k8spsdr(env.K8S_STG_NAMESPACE) 
+                             } 
+                        if (params.K8S_POD_STATUS == 'YES') 
+                        { 
+                            healthcheck.getPodStatus(env.K8S_STG_NAMESPACE)
+
+                        }
+                       
                    
                    
                     }

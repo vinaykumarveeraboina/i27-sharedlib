@@ -20,7 +20,7 @@ class K8shealthcheck {
 
       }
 
-       def k8sobjectstatus(namespace)
+       def k8snodestatus()
       {
     
                     jenkins.sh """
@@ -33,18 +33,28 @@ class K8shealthcheck {
 
                                      kubectl get ns
 
-                            echo " *************************  k8s DEPloyment details in ${namespace}  ******************** "
-
-                                     kubectl get deploy -n ${namespace}
-
-                            echo " ************************* k8s POD Status in ${namespace}  ******************** "
-
-                                     kubectl get pods -n ${namespace}
-
-
                         """
 
       }
+
+      def k8spsdr(namespace)
+      { 
+        jenkins.sh """
+       echo "Fetching Kubernetes objects' status in namespace ${namespace}"
+        kubectl get all -n ${namespace} 
+        
+        """ 
+        
+     } 
+        // Method to get pod status 
+        def getPodStatus(namespace) 
+        { 
+            jenkins.sh """ 
+        echo "Fetching pod status in namespace ${namespace}" 
+        kubectl get pods -n ${namespace}
+         """
+
+         }
 
       
 
