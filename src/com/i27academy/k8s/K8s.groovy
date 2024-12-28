@@ -78,7 +78,7 @@ class K8s {
 
         echo "checking if helm chat exists"
 
-        if helm list | grep -q ${appName}-${env}-chart ;then
+        if helm list -n ${namespace}| grep -q ${appName}-${env}-chart ;then
 
         echo "************** chat ${appName}-${env}-chart exists , proceeding with the chat upgarde **************"
         
