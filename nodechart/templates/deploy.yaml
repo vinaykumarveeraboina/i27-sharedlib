@@ -23,4 +23,4 @@ spec:
         args: ["dev"]
         env: 
         - name: ENVIRONMENT
-          value: "dev"
+          value: {{.Values.env }} 
