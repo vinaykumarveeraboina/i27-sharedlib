@@ -1,0 +1,6 @@
+apiVersion: v2
+name: cart-chat
+version: 0.0.1
+appVersion: "1.1.0"
+type: application
+description: i27 node app project chat 
