@@ -26,8 +26,6 @@ def call(Map pipelineParams) {
             JFROG_REPO = 'i27project.jfrog.io'
             JFROG_REGISTRY = 'boutique-docker'
             APPLICATION_NAME = "${pipelineParams.appName}"
-            POM_VERSION = readMavenPom().getVersion()
-            POM_PACKAGING = readMavenPom().getPackaging()
             DOCKER_CREDS = credentials('DockerHub')
             JFROG_CREDS = credentials('JFROG_CREDS')
             SONAR_URL = 'http://20.6.130.89:9000'
