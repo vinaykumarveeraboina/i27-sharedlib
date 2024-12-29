@@ -184,8 +184,9 @@ def call(Map pipelineParams) {
                 when {
                     allOf {
                         expression { params.deployToStage == 'YES' }
-                        branch 'release/*'
-                    }
+                        expression { env.BRANCH_NAME =~ /^release\/.*/}
+                   
+                }
                 }
                 steps {
                     timeout(time: 300, unit: 'SECONDS') {
